@@ -1,4 +1,4 @@
-use crate::types::{LastBlock, TopTokenHolders};
+use crate::types::{LastBlock, TopTokenHolders, TokenDailyTransactionCounts};
 use reqwest::Error;
 
 mod types;
@@ -100,4 +100,51 @@ pub fn get_last_block(api_key: &str) -> Result<LastBlock, Error> {
     };
 
     Ok(block)
+}
+
+pub fn get_token_daily_transaction_count(
+    address: &str,
+    mut period: u64,
+    api_key: &str,
+) -> Result<TokenDailyTransactionCounts, Error> {
+    let client = reqwest::blocking::Client::new();
+    let url = String::from("https://api.ethplorer.io/getTokenHistoryGrouped/") + address;
+
+    let final_api_key;
+    if api_key == "" {
+        final_api_key = "freekey";
+    } else {
+        final_api_key = api_key;
+    }
+
+    let mut query_params: [(&str, &str); 2] = [
+        ("apiKey", final_api_key),
+        ("", ""),
+    ];
+
+    let period_string;
+    if period != 0 {
+        if period > 90 {
+            period = 90;
+        }
+        period_string = period.to_string();
+        query_params[1] = ("period", period_string.as_str())
+    }
+
+    let query = client
+        .get(url)
+        .query(&query_params)
+        .send();
+
+    let res = match query {
+        Ok(res) => res,
+        Err(e) => return Err(e),
+    };
+
+    let counts = match res.json::<TokenDailyTransactionCounts>() {
+        Ok(txs_counts) => txs_counts,
+        Err(e) => return Err(e),
+    };
+
+    Ok(counts)
 }

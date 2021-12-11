@@ -1,33 +1,39 @@
-use crate::types::{LastBlock, TopTokenHolders, TokenDailyTransactionCounts};
+use crate::types::{LastBlock, TopTokenHolders, TokenDailyTransactionCounts, TokenInfo};
 use reqwest::Error;
 
 mod types;
 
-// pub fn get_token_info(address: string, api_key: String) -> Result<LastBlock, Error> {
-//     let client = reqwest::blocking::Client::new();
-//     let url = "https://api.ethplorer.io/getTokenInfo/" + address;
-//     let mut final_api_key = api_key;
+// println!("{:?}", res.text());
 //
-//     if final_api_key == "" {
-//         final_api_key = String::from("freekey");
-//     }
-//
-//     let query = client.get(url)
-//         .query(&[("apiKey", final_api_key)])
-//         .send();
-//
-//     let res = match query {
-//         Ok(res)  => res,
-//         Err(e) => return Err(e),
-//     };
-//
-//     let block = match res.json::<types::TokenInfo>() {
-//         Ok(last_block)  => last_block,
-//         Err(e) => return Err(e),
-//     };
-//
-//     Ok(block)
-// }
+// Ok(TokenInfo{ ..Default::default() })
+
+pub fn get_token_info(address: &str, api_key: &str) -> Result<TokenInfo, Error> {
+    let client = reqwest::blocking::Client::new();
+    let url = String::from("https://api.ethplorer.io/getTokenInfo/") + address;
+
+    let final_api_key;
+    if api_key == "" {
+        final_api_key = "freekey";
+    } else {
+        final_api_key = api_key;
+    }
+
+    let query = client.get(url)
+        .query(&[("apiKey", final_api_key)])
+        .send();
+
+    let res = match query {
+        Ok(res)  => res,
+        Err(e) => return Err(e),
+    };
+
+    let block = match res.json::<types::TokenInfo>() {
+        Ok(last_block)  => last_block,
+        Err(e) => return Err(e),
+    };
+
+    Ok(block)
+}
 
 pub fn get_top_token_holders(
     address: &str,

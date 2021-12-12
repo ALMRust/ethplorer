@@ -1,5 +1,5 @@
 [package]
-name = "ethplorer_rs"
+name = "ethplorer"
 version = "0.1.0"
 authors = ["Alessandro Maclaine <almaclaine@gmail.com>"]
 edition = "2018"

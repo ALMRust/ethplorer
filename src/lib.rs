@@ -4,7 +4,7 @@ use num::clamp;
 use crate::types::*;
 use reqwest::Error;
 use serde::de::DeserializeOwned;
-use crate::consts::{FREE_KEY, GET_ADDRESS_HISTORY, GET_ADDRESS_INFO_ROUTE, GET_ADDRESS_TRANSACTIONS_ROUTE, GET_LAST_BLOCK_ROUTE, GET_TOKEN_HISTORY_ROUTE, GET_TOKEN_INFO_ROUTE, GET_TOKENS_NEW_ROUTE, GET_TOP_ROUTE, GET_TOP_TOKEN_HOLDERS_ROUTE, GET_TOP_TOKENS_ROUTE, NETWORK};
+use crate::consts::*;
 
 pub mod types;
 mod consts;
@@ -15,11 +15,59 @@ mod consts;
 pub fn api_key_param(api_key: &str) -> (&str, String) {
     let out;
     if api_key == "" {
-        out = String::from(FREE_KEY);
+        out = String::from("freekey");
     } else {
         out = String::from(api_key);
     }
     ("apiKey", out)
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{api_key_param, GET_ADDRESS_INFO_ROUTE, get_token_info_config, GET_TOKEN_INFO_ROUTE, get_top_token_holders_config, GET_TOP_TOKEN_HOLDERS_ROUTE, NETWORK};
+
+    #[test]
+    fn api_key_param_works() {
+        let key1 = api_key_param("");
+        assert_eq!(("apiKey", String::from("freekey")), key1);
+
+        let key2 = api_key_param("test");
+        assert_eq!(("apiKey", String::from("test")), key2);
+    }
+
+    use crate::{get_address_info_config, GetAddressInfoParams};
+
+    #[test]
+    fn get_address_info_config_works() {
+        let token = "token".to_string();
+        let params = GetAddressInfoParams {
+            token,
+            show_eth_totals: false
+        };
+        let config = get_address_info_config("", "0x0", &params);
+        assert_eq!(config.network, NETWORK);
+        assert_eq!(config.routes, vec![GET_ADDRESS_INFO_ROUTE, "0x0"]);
+        assert_eq!(config.params, vec![("apiKey", String::from("freekey")), ("token", String::from("token")), ("showETHTotals", String::from("false"))]);
+        assert_eq!(config.to_string(), "https://api.ethplorer.io/getAddressInfo/0x0");
+    }
+
+    #[test]
+    fn get_token_info_config_works() {
+        let config = get_token_info_config("", "0x0");
+        assert_eq!(config.network, NETWORK);
+        assert_eq!(config.routes, vec![GET_TOKEN_INFO_ROUTE, "0x0"]);
+        assert_eq!(config.params, vec![("apiKey", String::from("freekey"))]);
+        assert_eq!(config.to_string(), "https://api.ethplorer.io/getTokenInfo/0x0");
+    }
+
+    #[test]
+    fn get_top_token_holders_config_works() {
+        let config = get_top_token_holders_config("", "0x0", 100);
+        assert_eq!(config.network, NETWORK);
+        assert_eq!(config.routes, vec![GET_TOP_TOKEN_HOLDERS_ROUTE, "0x0"]);
+        assert_eq!(config.params, vec![("apiKey", String::from("freekey")), ("limit", String::from("100"))]);
+        assert_eq!(config.to_string(), "https://api.ethplorer.io/getTopTokenHolders/0x0");
+    }
 }
 
 pub fn handle_request<T: DeserializeOwned>(config: RequestConfig) -> Result<T, Error> {
@@ -154,7 +202,7 @@ pub fn get_token_daily_transaction_count_config(api_key: &'a str, address: &'a s
 
     RequestConfig {
         network: NETWORK.to_string(),
-        routes: vec![GET_TOP_TOKEN_HOLDERS_ROUTE.to_string(), address.to_string()],
+        routes: vec![GET_TOKEN_DAILY_TRANSACTION_COUNT_ROUTE.to_string(), address.to_string()],
         params,
     }
 }
@@ -263,7 +311,7 @@ pub fn get_address_transactions_config(api_key: &'a str, address: &'a str, in_pa
         params.push(("timestamp", timestamp.to_string()));
     }
 
-    let show_zero_values = params.show_zero_values.to_string();
+    let show_zero_values = in_params.show_zero_values.to_string();
     params.push(("showZeroValues", show_zero_values));
 
     RequestConfig {
@@ -345,7 +393,7 @@ pub fn get_token_daily_price_history_config(
 
     RequestConfig {
         network: NETWORK.to_string(),
-        routes: vec![GET_TOP_ROUTE.to_string(), address.to_string()],
+        routes: vec![GET_TOKEN_PRICE_HISTORY_GROUPED_ROUTE.to_string(), address.to_string()],
         params,
     }
 }

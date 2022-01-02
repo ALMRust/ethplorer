@@ -3,7 +3,7 @@ use chrono::{DateTime, NaiveDateTime, Utc};
 use serde::de::{MapAccess, Visitor, SeqAccess, value};
 use serde::{de, Deserialize, Deserializer};
 use std::fmt;
-use std::fmt::{Display, Formatter, write};
+use std::fmt::{Display, Formatter};
 use std::marker::PhantomData;
 use std::ops::Deref;
 use std::str::FromStr;

@@ -9,6 +9,10 @@ use std::ops::Deref;
 use std::str::FromStr;
 use void::Void;
 
+pub struct RequestConfig {
+
+}
+
 #[derive(Deserialize, Debug, Default)]
 pub struct LastBlock {
     #[serde(rename(deserialize = "lastBlock"))]

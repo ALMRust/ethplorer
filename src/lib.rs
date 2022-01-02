@@ -2,11 +2,16 @@ use crate::types::{AddressInfo, AddressTransaction, GetAddressHistoryParams, Get
 use reqwest::Error;
 
 pub mod types;
+mod consts;
 
 // TODO: Add status code error handling
 // TODO: use macro for repeat values
 
-pub fn get_address_info(address: &str, api_key: &str) -> Result<AddressInfo, Error> {
+pub fn get_address_token_info(
+    address: &str,
+    params: &GetAddressTokenInfoParams,
+    api_key: &str,
+) -> Result<AddressInfo, Error> {
     let client = reqwest::blocking::Client::new();
     let url = String::from("https://api.ethplorer.io/getAddressInfo/") + address;
 
@@ -17,19 +22,28 @@ pub fn get_address_info(address: &str, api_key: &str) -> Result<AddressInfo, Err
         final_api_key = api_key;
     }
 
-    let query = client.get(url).query(&[("apiKey", final_api_key)]).send();
+    let mut query_params: [(&str, &str); 3] = [("apiKey", final_api_key), ("", ""), ("", "")];
+
+    if params.token != "" {
+        query_params[1] = ("token", params.token.as_str())
+    }
+
+    let eth_totals = params.show_eth_totals.to_string();
+    query_params[2] = ("showETHTotals", eth_totals.as_str());
+
+    let query = client.get(url).query(&query_params).send();
 
     let res = match query {
         Ok(res) => res,
         Err(e) => return Err(e),
     };
 
-    let block = match res.json::<types::AddressInfo>() {
-        Ok(last_block) => last_block,
+    let counts = match res.json::<AddressInfo>() {
+        Ok(txs_counts) => txs_counts,
         Err(e) => return Err(e),
     };
 
-    Ok(block)
+    Ok(counts)
 }
 
 pub fn get_token_info(address: &str, api_key: &str) -> Result<TokenInfo, Error> {
@@ -192,45 +206,6 @@ pub fn get_token_daily_transaction_count(
     Ok(counts)
 }
 
-pub fn get_address_token_info(
-    address: &str,
-    params: &GetAddressTokenInfoParams,
-    api_key: &str,
-) -> Result<AddressInfo, Error> {
-    let client = reqwest::blocking::Client::new();
-    let url = String::from("https://api.ethplorer.io/getAddressInfo/") + address;
-
-    let final_api_key;
-    if api_key == "" {
-        final_api_key = "freekey";
-    } else {
-        final_api_key = api_key;
-    }
-
-    let mut query_params: [(&str, &str); 3] = [("apiKey", final_api_key), ("", ""), ("", "")];
-
-    if params.token != "" {
-        query_params[1] = ("token", params.token.as_str())
-    }
-
-    let eth_totals = params.show_eth_totals.to_string();
-    query_params[2] = ("showETHTotals", eth_totals.as_str());
-
-    let query = client.get(url).query(&query_params).send();
-
-    let res = match query {
-        Ok(res) => res,
-        Err(e) => return Err(e),
-    };
-
-    let counts = match res.json::<AddressInfo>() {
-        Ok(txs_counts) => txs_counts,
-        Err(e) => return Err(e),
-    };
-
-    Ok(counts)
-}
-
 pub fn get_token_history(
     address: &str,
     params: &GetTokenHistoryParams,
@@ -290,7 +265,7 @@ pub fn get_address_history(
     api_key: &str,
 ) -> Result<TokenHistory, Error> {
     let client = reqwest::blocking::Client::new();
-    let url = String::from("https://api.ethplorer.io/getTokenHistory/") + address;
+    let url = String::from("https://api.ethplorer.io/getAddressHistory/") + address;
 
     let final_api_key;
     if api_key == "" {

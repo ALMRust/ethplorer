@@ -3,14 +3,26 @@ use chrono::{DateTime, NaiveDateTime, Utc};
 use serde::de::{MapAccess, Visitor, SeqAccess, value};
 use serde::{de, Deserialize, Deserializer};
 use std::fmt;
-use std::fmt::Display;
+use std::fmt::{Display, Formatter, write};
 use std::marker::PhantomData;
 use std::ops::Deref;
 use std::str::FromStr;
 use void::Void;
 
-pub struct RequestConfig {
+pub struct RequestConfig<'a> {
+    pub network: String,
+    pub routes: Vec<String>,
+    pub params: Vec<(&'a str, String)>,
+}
 
+impl Display for RequestConfig<'a> {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "{}", self.network)?;
+        for route in &self.routes {
+            write!(f, "/{}", route)?;
+        }
+        write!(f, "")
+    }
 }
 
 #[derive(Deserialize, Debug, Default)]
@@ -400,7 +412,7 @@ pub struct TokenDailyPriceHistory {
 
 // Struct Params
 #[derive(Debug, Default)]
-pub struct GetAddressTokenInfoParams {
+pub struct GetAddressInfoParams {
     pub token: String,
     pub show_eth_totals: bool,
 }

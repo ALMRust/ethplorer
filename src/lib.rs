@@ -1,5 +1,9 @@
+#![feature(in_band_lifetimes)]
+
 use crate::types::*;
 use reqwest::Error;
+use serde::de::DeserializeOwned;
+use crate::consts::{FREE_KEY, GET_ADDRESS_INFO_ROUTE, GET_LAST_BLOCK_ROUTE, NETWORK};
 
 pub mod types;
 mod consts;
@@ -7,10 +11,49 @@ mod consts;
 // TODO: Add status code error handling
 // TODO: use macro for repeat values
 
-pub fn get_address_token_info(
+pub fn api_key_param(api_key: &str) -> (&str, String) {
+    let out;
+    if api_key == "" {
+        out = String::from(FREE_KEY);
+    } else {
+        out = String::from(api_key);
+    }
+    ("apiKey", out)
+}
+
+pub fn handle_request<T: DeserializeOwned>(config: RequestConfig) -> Result<T, Error> {
+    let url = config.to_string();
+    let client = reqwest::blocking::Client::new();
+    let res = client.get(url).query(&config.params).send()?;
+    res.json::<T>()
+}
+
+pub fn get_address_info_config<'a>(
+    api_key: &'a str,
+    address: &'a str,
+    in_params: &'a GetAddressInfoParams,
+) -> RequestConfig<'a> {
+    let key = api_key_param(api_key);
+    let mut params = vec![key];
+
+    if in_params.token != "" {
+        params.push(("token", in_params.token.clone()));
+    }
+
+    let eth_totals = in_params.show_eth_totals.to_string();
+    params.push(("showETHTotals", eth_totals));
+
+    RequestConfig {
+        network: NETWORK.to_string(),
+        routes: vec![GET_ADDRESS_INFO_ROUTE.to_string(), address.to_string()],
+        params,
+    }
+}
+
+pub fn get_address_info(
     api_key: &str,
     address: &str,
-    params: &GetAddressTokenInfoParams,
+    params: &GetAddressInfoParams,
 ) -> Result<AddressInfo, Error> {
     let client = reqwest::blocking::Client::new();
     let url = String::from("https://api.ethplorer.io/getAddressInfo/") + address;
@@ -80,19 +123,22 @@ pub fn get_top_token_holders(
     res.json::<TopTokenHolders>()
 }
 
-pub fn get_last_block(api_key: &str) -> Result<LastBlock, Error> {
-    let client = reqwest::blocking::Client::new();
-    let url = "https://api.ethplorer.io/getLastBlock";
+// Get Last Block
 
-    let final_api_key;
-    if api_key == "" {
-        final_api_key = "freekey";
-    } else {
-        final_api_key = api_key;
+pub fn get_last_block_config(
+    api_key: &str,
+) -> RequestConfig {
+    let key = api_key_param(api_key);
+    RequestConfig {
+        network: NETWORK.to_string(),
+        routes: vec![GET_LAST_BLOCK_ROUTE.to_string()],
+        params: vec![key],
     }
+}
 
-    let res = client.get(url).query(&[("apiKey", final_api_key)]).send()?;
-    res.json::<LastBlock>()
+pub fn get_last_block(api_key: &str) -> Result<LastBlock, Error> {
+    let config = get_last_block_config(api_key);
+    handle_request(config)
 }
 
 pub fn get_token_new(api_key: &str) -> Result<Vec<TokenInfo>, Error> {

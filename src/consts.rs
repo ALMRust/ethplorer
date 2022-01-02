@@ -12,3 +12,4 @@ pub const GET_ADDRESS_TRANSACTIONS_ROUTE: &str = "getAddressTransactions";
 pub const GET_TOP_TOKENS_ROUTE: &str = "getTopTokens";
 pub const GET_TOP_ROUTE: &str = "getTop";
 pub const GET_TOKEN_PRICE_HISTORY_GROUPED: &str = "getTokenPriceHistoryGrouped";
+pub const GET_ADDRESS_HISTORY: &str = "getAddressHistory";

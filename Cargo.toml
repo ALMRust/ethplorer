@@ -12,3 +12,4 @@ serde = { version = "1.0.130", features = ["derive"] }
 void = { version = "1.0.2" }
 chrono = { version = "0.4", features = ["serde"] }
 serde_with = "1.11.0"
+num = "0.4.0"

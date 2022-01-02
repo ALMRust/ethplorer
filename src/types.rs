@@ -9,13 +9,13 @@ use std::ops::Deref;
 use std::str::FromStr;
 use void::Void;
 
-pub struct RequestConfig<'a> {
+pub struct RequestConfig {
     pub network: String,
     pub routes: Vec<String>,
-    pub params: Vec<(&'a str, String)>,
+    pub params: Vec<(String, String)>,
 }
 
-impl Display for RequestConfig<'a> {
+impl Display for RequestConfig {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         write!(f, "{}", self.network)?;
         for route in &self.routes {

@@ -1,73 +1,25 @@
 #![feature(in_band_lifetimes)]
 
 use num::clamp;
-use crate::types::*;
+pub use crate::types::*;
 use reqwest::Error;
 use serde::de::DeserializeOwned;
-use crate::consts::*;
+pub use crate::consts::*;
 
 pub mod types;
-mod consts;
+pub mod consts;
 
 // TODO: Add status code error handling
 // TODO: use macro for repeat values
 
-pub fn api_key_param(api_key: &str) -> (&str, String) {
+pub fn api_key_param(api_key: &str) -> (String, String) {
     let out;
     if api_key == "" {
         out = String::from("freekey");
     } else {
-        out = String::from(api_key);
+        out = api_key.to_string();
     }
-    ("apiKey", out)
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::{api_key_param, GET_ADDRESS_INFO_ROUTE, get_token_info_config, GET_TOKEN_INFO_ROUTE, get_top_token_holders_config, GET_TOP_TOKEN_HOLDERS_ROUTE, NETWORK};
-
-    #[test]
-    fn api_key_param_works() {
-        let key1 = api_key_param("");
-        assert_eq!(("apiKey", String::from("freekey")), key1);
-
-        let key2 = api_key_param("test");
-        assert_eq!(("apiKey", String::from("test")), key2);
-    }
-
-    use crate::{get_address_info_config, GetAddressInfoParams};
-
-    #[test]
-    fn get_address_info_config_works() {
-        let token = "token".to_string();
-        let params = GetAddressInfoParams {
-            token,
-            show_eth_totals: false
-        };
-        let config = get_address_info_config("", "0x0", &params);
-        assert_eq!(config.network, NETWORK);
-        assert_eq!(config.routes, vec![GET_ADDRESS_INFO_ROUTE, "0x0"]);
-        assert_eq!(config.params, vec![("apiKey", String::from("freekey")), ("token", String::from("token")), ("showETHTotals", String::from("false"))]);
-        assert_eq!(config.to_string(), "https://api.ethplorer.io/getAddressInfo/0x0");
-    }
-
-    #[test]
-    fn get_token_info_config_works() {
-        let config = get_token_info_config("", "0x0");
-        assert_eq!(config.network, NETWORK);
-        assert_eq!(config.routes, vec![GET_TOKEN_INFO_ROUTE, "0x0"]);
-        assert_eq!(config.params, vec![("apiKey", String::from("freekey"))]);
-        assert_eq!(config.to_string(), "https://api.ethplorer.io/getTokenInfo/0x0");
-    }
-
-    #[test]
-    fn get_top_token_holders_config_works() {
-        let config = get_top_token_holders_config("", "0x0", 100);
-        assert_eq!(config.network, NETWORK);
-        assert_eq!(config.routes, vec![GET_TOP_TOKEN_HOLDERS_ROUTE, "0x0"]);
-        assert_eq!(config.params, vec![("apiKey", String::from("freekey")), ("limit", String::from("100"))]);
-        assert_eq!(config.to_string(), "https://api.ethplorer.io/getTopTokenHolders/0x0");
-    }
+    (String::from("apiKey"), out)
 }
 
 pub fn handle_request<T: DeserializeOwned>(config: RequestConfig) -> Result<T, Error> {
@@ -79,20 +31,20 @@ pub fn handle_request<T: DeserializeOwned>(config: RequestConfig) -> Result<T, E
 
 // Get Address Info
 
-pub fn get_address_info_config<'a>(
-    api_key: &'a str,
-    address: &'a str,
-    in_params: &'a GetAddressInfoParams,
-) -> RequestConfig<'a> {
+pub fn get_address_info_config(
+    api_key: &str,
+    address: &str,
+    in_params: &GetAddressInfoParams,
+) -> RequestConfig {
     let key = api_key_param(api_key);
     let mut params = vec![key];
 
     if in_params.token != "" {
-        params.push(("token", in_params.token.clone()));
+        params.push(("token".to_string(), in_params.token.clone()));
     }
 
     let eth_totals = in_params.show_eth_totals.to_string();
-    params.push(("showETHTotals", eth_totals));
+    params.push(("showETHTotals".to_string(), eth_totals));
 
     RequestConfig {
         network: NETWORK.to_string(),
@@ -112,7 +64,7 @@ pub fn get_address_info(
 
 // Get Token Info
 
-pub fn get_token_info_config(api_key: &'a str, address: &'a str) -> RequestConfig<'a> {
+pub fn get_token_info_config(api_key: &str, address: &str) -> RequestConfig {
     let key = api_key_param(api_key);
     RequestConfig {
         network: NETWORK.to_string(),
@@ -128,13 +80,13 @@ pub fn get_token_info(api_key: &str, address: &str) -> Result<TokenInfo, Error> 
 
 // Get Top Token Holders
 
-pub fn get_top_token_holders_config(api_key: &'a str, address: &'a str, mut limit: u64) -> RequestConfig<'a> {
+pub fn get_top_token_holders_config(api_key: &str, address: &str, mut limit: u64) -> RequestConfig {
     let key = api_key_param(api_key);
     let mut params = vec![key];
 
     if limit != 0 {
         limit = clamp(limit, 0, 1000);
-        params.push(("limit", limit.to_string()))
+        params.push(("limit".to_string(), limit.to_string()))
     }
 
     RequestConfig {
@@ -191,13 +143,13 @@ pub fn get_tokens_new(api_key: &str) -> Result<Vec<TokenInfo>, Error> {
 
 // Get Token Daily Transaction Count
 
-pub fn get_token_daily_transaction_count_config(api_key: &'a str, address: &'a str, mut period: u64) -> RequestConfig<'a> {
+pub fn get_token_daily_transaction_count_config(api_key: &str, address: &str, mut period: u64) -> RequestConfig {
     let key = api_key_param(api_key);
     let mut params = vec![key];
 
     if period != 0 {
         period = clamp(period, 0, 90);
-        params.push(("period", period.to_string()))
+        params.push(("period".to_string(), period.to_string()))
     }
 
     RequestConfig {
@@ -218,23 +170,23 @@ pub fn get_token_daily_transaction_count(
 
 // Get Token History
 
-pub fn get_token_history_config(api_key: &'a str, address: &'a str, in_params: &GetTokenHistoryParams) -> RequestConfig<'a> {
+pub fn get_token_history_config(api_key: &str, address: &str, in_params: &GetTokenHistoryParams) -> RequestConfig {
     let key = api_key_param(api_key);
     let mut params = vec![key];
 
     let mut limit = in_params.limit;
     if limit != 0 {
         limit = clamp(limit, 0, 1000);
-        params.push(("limit", limit.to_string()))
+        params.push(("limit".to_string(), limit.to_string()))
     }
 
     if in_params.history_type != "" {
-        params.push(("type", in_params.history_type.clone()));
+        params.push(("type".to_string(), in_params.history_type.clone()));
     }
 
     let timestamp = in_params.timestamp.timestamp();
     if timestamp != 0 {
-        params.push(("timestamp", timestamp.to_string()));
+        params.push(("timestamp".to_string(), timestamp.to_string()));
     }
 
     RequestConfig {
@@ -255,27 +207,27 @@ pub fn get_token_history(
 
 // Get Address History
 
-pub fn get_address_history_config(api_key: &'a str, address: &'a str, in_params: &GetAddressHistoryParams) -> RequestConfig<'a> {
+pub fn get_address_history_config(api_key: &str, address: &str, in_params: &GetAddressHistoryParams) -> RequestConfig {
     let key = api_key_param(api_key);
     let mut params = vec![key];
 
     let mut limit = in_params.limit;
     if limit != 0 {
         limit = clamp(limit, 0, 1000);
-        params.push(("limit", limit.to_string()))
+        params.push(("limit".to_string(), limit.to_string()))
     }
 
     if in_params.history_type != "" {
-        params.push(("type", in_params.history_type.clone()));
+        params.push(("type".to_string(), in_params.history_type.clone()));
     }
 
     let timestamp = in_params.timestamp.timestamp();
     if timestamp != 0 {
-        params.push(("timestamp", timestamp.to_string()));
+        params.push(("timestamp".to_string(), timestamp.to_string()));
     }
 
     if in_params.token != "" {
-        params.push(("token", in_params.token.clone()));
+        params.push(("token".to_string(), in_params.token.clone()));
     }
 
     RequestConfig {
@@ -296,23 +248,23 @@ pub fn get_address_history(
 
 // Get Address Transactions
 
-pub fn get_address_transactions_config(api_key: &'a str, address: &'a str, in_params: &GetAddressTransactionsParams) -> RequestConfig<'a> {
+pub fn get_address_transactions_config(api_key: &str, address: &str, in_params: &GetAddressTransactionsParams) -> RequestConfig {
     let key = api_key_param(api_key);
     let mut params = vec![key];
 
     let mut limit = in_params.limit;
     if limit != 0 {
         limit = clamp(limit, 0, 1000);
-        params.push(("limit", limit.to_string()))
+        params.push(("limit".to_string(), limit.to_string()))
     }
 
     let timestamp = in_params.timestamp.timestamp();
     if timestamp != 0 {
-        params.push(("timestamp", timestamp.to_string()));
+        params.push(("timestamp".to_string(), timestamp.to_string()));
     }
 
     let show_zero_values = in_params.show_zero_values.to_string();
-    params.push(("showZeroValues", show_zero_values));
+    params.push(("showZeroValues".to_string(), show_zero_values));
 
     RequestConfig {
         network: NETWORK.to_string(),
@@ -350,18 +302,18 @@ pub fn get_top_tokens(api_key: &str) -> Result<TopTokens, Error> {
 
 // Get Top
 
-pub fn get_top_config(api_key: &'a str, in_params: &GetTopParams) -> RequestConfig<'a> {
+pub fn get_top_config(api_key: &str, in_params: &GetTopParams) -> RequestConfig {
     let key = api_key_param(api_key);
     let mut params = vec![key];
 
     let mut limit = in_params.limit;
     if limit != 0 {
         limit = clamp(limit, 0, 1000);
-        params.push(("limit", limit.to_string()))
+        params.push(("limit".to_string(), limit.to_string()))
     }
 
     if in_params.criteria != "" {
-        params.push(("criteria", in_params.criteria.clone()));
+        params.push(("criteria".to_string(), in_params.criteria.clone()));
     }
 
     RequestConfig {
@@ -379,16 +331,16 @@ pub fn get_top(api_key: &str, params: &GetTopParams) -> Result<TopTokens, Error>
 // Get Token Daily Price History
 
 pub fn get_token_daily_price_history_config(
-    api_key: &'a str,
+    api_key: & str,
     address: &str,
     mut period: u64
-) -> RequestConfig<'a> {
+) -> RequestConfig {
     let key = api_key_param(api_key);
     let mut params = vec![key];
 
     if period != 0 {
         period = clamp(period, 0, 90);
-        params.push(("period", period.to_string()))
+        params.push(("period".to_string(), period.to_string()))
     }
 
     RequestConfig {

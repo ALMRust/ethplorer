@@ -355,6 +355,6 @@ pub fn get_token_daily_price_history(
     address: &str,
     period: u64,
 ) -> Result<TokenDailyPriceHistory, Error> {
-    let config = get_top_config(api_key, address, period);
+    let config = get_token_daily_price_history_config(api_key, address, period);
     handle_request(config)
 }

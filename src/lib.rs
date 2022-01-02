@@ -1,4 +1,4 @@
-use crate::types::{AddressInfo, AddressTransaction, GetAddressHistoryParams, GetAddressTokenInfoParams, GetAddressTransactionsParams, GetTokenHistoryParams, LastBlock, TokenDailyTransactionCounts, TokenHistory, TokenInfo, TopTokenHolders, TopTokens, GetTopParams, TokenDailyPriceHistory};
+use crate::types::*;
 use reqwest::Error;
 
 pub mod types;
@@ -8,9 +8,9 @@ mod consts;
 // TODO: use macro for repeat values
 
 pub fn get_address_token_info(
+    api_key: &str,
     address: &str,
     params: &GetAddressTokenInfoParams,
-    api_key: &str,
 ) -> Result<AddressInfo, Error> {
     let client = reqwest::blocking::Client::new();
     let url = String::from("https://api.ethplorer.io/getAddressInfo/") + address;
@@ -35,7 +35,7 @@ pub fn get_address_token_info(
     res.json::<AddressInfo>()
 }
 
-pub fn get_token_info(address: &str, api_key: &str) -> Result<TokenInfo, Error> {
+pub fn get_token_info(api_key: &str, address: &str) -> Result<TokenInfo, Error> {
     let client = reqwest::blocking::Client::new();
     let url = String::from("https://api.ethplorer.io/getTokenInfo/") + address;
 
@@ -51,9 +51,9 @@ pub fn get_token_info(address: &str, api_key: &str) -> Result<TokenInfo, Error> 
 }
 
 pub fn get_top_token_holders(
+    api_key: &str,
     address: &str,
     mut limit: u64,
-    api_key: &str,
 ) -> Result<TopTokenHolders, Error> {
     let client = reqwest::blocking::Client::new();
     let url = String::from("https://api.ethplorer.io/getTopTokenHolders/") + address;
@@ -111,9 +111,9 @@ pub fn get_token_new(api_key: &str) -> Result<Vec<TokenInfo>, Error> {
 }
 
 pub fn get_token_daily_transaction_count(
+    api_key: &str,
     address: &str,
     mut period: u64,
-    api_key: &str,
 ) -> Result<TokenDailyTransactionCounts, Error> {
     let client = reqwest::blocking::Client::new();
     let url = String::from("https://api.ethplorer.io/getTokenHistoryGrouped/") + address;
@@ -141,9 +141,9 @@ pub fn get_token_daily_transaction_count(
 }
 
 pub fn get_token_history(
+    api_key: &str,
     address: &str,
     params: &GetTokenHistoryParams,
-    api_key: &str,
 ) -> Result<TokenHistory, Error> {
     let client = reqwest::blocking::Client::new();
     let url = String::from("https://api.ethplorer.io/getTokenHistory/") + address;
@@ -183,9 +183,9 @@ pub fn get_token_history(
 }
 
 pub fn get_address_history(
+    api_key: &str,
     address: &str,
     params: &GetAddressHistoryParams,
-    api_key: &str,
 ) -> Result<TokenHistory, Error> {
     let client = reqwest::blocking::Client::new();
     let url = String::from("https://api.ethplorer.io/getAddressHistory/") + address;
@@ -235,9 +235,9 @@ pub fn get_address_history(
 }
 
 pub fn get_address_transactions(
+    api_key: &str,
     address: &str,
     params: &GetAddressTransactionsParams,
-    api_key: &str,
 ) -> Result<Vec<AddressTransaction>, Error> {
     let client = reqwest::blocking::Client::new();
     let url = String::from("https://api.ethplorer.io/getAddressTransactions/") + address;
@@ -291,7 +291,7 @@ pub fn get_top_tokens(api_key: &str) -> Result<TopTokens, Error> {
     res.json::<TopTokens>()
 }
 
-pub fn get_top(params: &GetTopParams, api_key: &str) -> Result<TopTokens, Error> {
+pub fn get_top(api_key: &str, params: &GetTopParams) -> Result<TopTokens, Error> {
     let client = reqwest::blocking::Client::new();
     let url = String::from("https://api.ethplorer.io/getTop/");
 
@@ -324,9 +324,9 @@ pub fn get_top(params: &GetTopParams, api_key: &str) -> Result<TopTokens, Error>
 }
 
 pub fn get_token_daily_price_history(
+    api_key: &str,
     address: &str,
     mut period: u64,
-    api_key: &str,
 ) -> Result<TokenDailyPriceHistory, Error> {
     let client = reqwest::blocking::Client::new();
     let url = String::from("https://api.ethplorer.io/getTokenPriceHistoryGrouped/") + address;

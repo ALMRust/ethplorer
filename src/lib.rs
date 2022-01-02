@@ -4,7 +4,7 @@ use num::clamp;
 use crate::types::*;
 use reqwest::Error;
 use serde::de::DeserializeOwned;
-use crate::consts::{FREE_KEY, GET_ADDRESS_HISTORY, GET_ADDRESS_INFO_ROUTE, GET_LAST_BLOCK_ROUTE, GET_TOKEN_HISTORY_ROUTE, GET_TOKEN_INFO_ROUTE, GET_TOKENS_NEW_ROUTE, GET_TOP_TOKEN_HOLDERS_ROUTE, NETWORK};
+use crate::consts::{FREE_KEY, GET_ADDRESS_HISTORY, GET_ADDRESS_INFO_ROUTE, GET_ADDRESS_TRANSACTIONS_ROUTE, GET_LAST_BLOCK_ROUTE, GET_TOKEN_HISTORY_ROUTE, GET_TOKEN_INFO_ROUTE, GET_TOKENS_NEW_ROUTE, GET_TOP_ROUTE, GET_TOP_TOKEN_HOLDERS_ROUTE, GET_TOP_TOKENS_ROUTE, NETWORK};
 
 pub mod types;
 mod consts;
@@ -248,121 +248,113 @@ pub fn get_address_history(
 
 // Get Address Transactions
 
+pub fn get_address_transactions_config(api_key: &'a str, address: &'a str, in_params: &GetAddressTransactionsParams) -> RequestConfig<'a> {
+    let key = api_key_param(api_key);
+    let mut params = vec![key];
+
+    let mut limit = in_params.limit;
+    if limit != 0 {
+        limit = clamp(limit, 0, 1000);
+        params.push(("limit", limit.to_string()))
+    }
+
+    let timestamp = in_params.timestamp.timestamp();
+    if timestamp != 0 {
+        params.push(("timestamp", timestamp.to_string()));
+    }
+
+    let show_zero_values = params.show_zero_values.to_string();
+    params.push(("showZeroValues", show_zero_values));
+
+    RequestConfig {
+        network: NETWORK.to_string(),
+        routes: vec![GET_ADDRESS_TRANSACTIONS_ROUTE.to_string(), address.to_string()],
+        params,
+    }
+}
+
 pub fn get_address_transactions(
     api_key: &str,
     address: &str,
     params: &GetAddressTransactionsParams,
 ) -> Result<Vec<AddressTransaction>, Error> {
-    let client = reqwest::blocking::Client::new();
-    let url = String::from("https://api.ethplorer.io/getAddressTransactions/") + address;
+    let config = get_address_transactions_config(api_key, address, params);
+    handle_request(config)
+}
 
-    let final_api_key;
-    if api_key == "" {
-        final_api_key = "freekey";
-    } else {
-        final_api_key = api_key;
+// Get Top Tokens
+
+pub fn get_top_tokens_config(
+    api_key: &str,
+) -> RequestConfig {
+    let key = api_key_param(api_key);
+    RequestConfig {
+        network: NETWORK.to_string(),
+        routes: vec![GET_TOP_TOKENS_ROUTE.to_string()],
+        params: vec![key],
     }
-
-    let mut query_params: [(&str, &str); 4] =
-        [("apiKey", final_api_key), ("", ""), ("", ""), ("", "")];
-
-    let limit_string;
-    let mut limit = params.limit;
-    if limit != 0 {
-        if limit > 1000 {
-            limit = 1000;
-        }
-        limit_string = limit.to_string();
-        query_params[1] = ("limit", limit_string.as_str())
-    }
-
-    let timestamp_string;
-    if params.timestamp.timestamp() != 0 {
-        timestamp_string = params.timestamp.timestamp().to_string();
-        query_params[2] = ("timestamp", timestamp_string.as_str());
-    }
-
-    let show_zero_values = params.show_zero_values.to_string();
-    query_params[3] = ("showZeroValues", show_zero_values.as_str());
-
-    let res = client.get(url).query(&query_params).send()?;
-    res.json::<Vec<AddressTransaction>>()
 }
 
 pub fn get_top_tokens(api_key: &str) -> Result<TopTokens, Error> {
-    let client = reqwest::blocking::Client::new();
-    let url = "https://api.ethplorer.io/getTopTokens";
+    let config = get_top_tokens_config(api_key);
+    handle_request(config)
+}
 
-    let final_api_key;
-    if api_key == "" {
-        final_api_key = "freekey";
-    } else {
-        final_api_key = api_key;
+// Get Top
+
+pub fn get_top_config(api_key: &'a str, in_params: &GetTopParams) -> RequestConfig<'a> {
+    let key = api_key_param(api_key);
+    let mut params = vec![key];
+
+    let mut limit = in_params.limit;
+    if limit != 0 {
+        limit = clamp(limit, 0, 1000);
+        params.push(("limit", limit.to_string()))
     }
 
-    let res = client.get(url).query(&[("apiKey", final_api_key)]).send()?;
+    if in_params.criteria != "" {
+        params.push(("criteria", in_params.criteria.clone()));
+    }
 
-    res.json::<TopTokens>()
+    RequestConfig {
+        network: NETWORK.to_string(),
+        routes: vec![GET_TOP_ROUTE.to_string()],
+        params,
+    }
 }
 
 pub fn get_top(api_key: &str, params: &GetTopParams) -> Result<TopTokens, Error> {
-    let client = reqwest::blocking::Client::new();
-    let url = String::from("https://api.ethplorer.io/getTop/");
+    let config = get_top_config(api_key, params);
+    handle_request(config)
+}
 
-    let final_api_key;
-    if api_key == "" {
-        final_api_key = "freekey";
-    } else {
-        final_api_key = api_key;
+// Get Token Daily Price History
+
+pub fn get_token_daily_price_history_config(
+    api_key: &'a str,
+    address: &str,
+    mut period: u64
+) -> RequestConfig<'a> {
+    let key = api_key_param(api_key);
+    let mut params = vec![key];
+
+    if period != 0 {
+        period = clamp(period, 0, 90);
+        params.push(("period", period.to_string()))
     }
 
-    let mut query_params: [(&str, &str); 4] =
-        [("apiKey", final_api_key), ("", ""), ("", ""), ("", "")];
-
-    let mut limit = params.limit;
-    let limit_string;
-    if limit != 0 {
-        if limit > 1000 {
-            limit = 1000;
-        }
-        limit_string = limit.to_string();
-        query_params[1] = ("limit", limit_string.as_str())
+    RequestConfig {
+        network: NETWORK.to_string(),
+        routes: vec![GET_TOP_ROUTE.to_string(), address.to_string()],
+        params,
     }
-
-    if params.criteria != "" {
-        query_params[2] = ("criteria", params.criteria.as_str());
-    }
-
-    let res = client.get(url).query(&query_params).send()?;
-    res.json::<TopTokens>()
 }
 
 pub fn get_token_daily_price_history(
     api_key: &str,
     address: &str,
-    mut period: u64,
+    period: u64,
 ) -> Result<TokenDailyPriceHistory, Error> {
-    let client = reqwest::blocking::Client::new();
-    let url = String::from("https://api.ethplorer.io/getTokenPriceHistoryGrouped/") + address;
-
-    let final_api_key;
-    if api_key == "" {
-        final_api_key = "freekey";
-    } else {
-        final_api_key = api_key;
-    }
-
-    let mut query_params: [(&str, &str); 2] = [("apiKey", final_api_key), ("", "")];
-
-    let period_string;
-    if period != 0 {
-        if period > 90 {
-            period = 90;
-        }
-        period_string = period.to_string();
-        query_params[1] = ("period", period_string.as_str())
-    }
-
-    let res = client.get(url).query(&query_params).send()?;
-    res.json::<TokenDailyPriceHistory>()
+    let config = get_top_config(api_key, address, period);
+    handle_request(config)
 }

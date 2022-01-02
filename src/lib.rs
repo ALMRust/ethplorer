@@ -31,19 +31,8 @@ pub fn get_address_token_info(
     let eth_totals = params.show_eth_totals.to_string();
     query_params[2] = ("showETHTotals", eth_totals.as_str());
 
-    let query = client.get(url).query(&query_params).send();
-
-    let res = match query {
-        Ok(res) => res,
-        Err(e) => return Err(e),
-    };
-
-    let counts = match res.json::<AddressInfo>() {
-        Ok(txs_counts) => txs_counts,
-        Err(e) => return Err(e),
-    };
-
-    Ok(counts)
+    let res = client.get(url).query(&query_params).send()?;
+    res.json::<AddressInfo>()
 }
 
 pub fn get_token_info(address: &str, api_key: &str) -> Result<TokenInfo, Error> {
@@ -57,19 +46,8 @@ pub fn get_token_info(address: &str, api_key: &str) -> Result<TokenInfo, Error> 
         final_api_key = api_key;
     }
 
-    let query = client.get(url).query(&[("apiKey", final_api_key)]).send();
-
-    let res = match query {
-        Ok(res) => res,
-        Err(e) => return Err(e),
-    };
-
-    let block = match res.json::<types::TokenInfo>() {
-        Ok(last_block) => last_block,
-        Err(e) => return Err(e),
-    };
-
-    Ok(block)
+    let res = client.get(url).query(&[("apiKey", final_api_key)]).send()?;
+    res.json::<types::TokenInfo>()
 }
 
 pub fn get_top_token_holders(
@@ -98,19 +76,8 @@ pub fn get_top_token_holders(
         query_params[1] = ("limit", limit_string.as_str())
     }
 
-    let query = client.get(url).query(&query_params).send();
-
-    let res = match query {
-        Ok(res) => res,
-        Err(e) => return Err(e),
-    };
-
-    let holders = match res.json::<TopTokenHolders>() {
-        Ok(top_holders) => top_holders,
-        Err(e) => return Err(e),
-    };
-
-    Ok(holders)
+    let res = client.get(url).query(&query_params).send()?;
+    res.json::<TopTokenHolders>()
 }
 
 pub fn get_last_block(api_key: &str) -> Result<LastBlock, Error> {
@@ -124,19 +91,8 @@ pub fn get_last_block(api_key: &str) -> Result<LastBlock, Error> {
         final_api_key = api_key;
     }
 
-    let query = client.get(url).query(&[("apiKey", final_api_key)]).send();
-
-    let res = match query {
-        Ok(res) => res,
-        Err(e) => return Err(e),
-    };
-
-    let block = match res.json::<LastBlock>() {
-        Ok(last_block) => last_block,
-        Err(e) => return Err(e),
-    };
-
-    Ok(block)
+    let res = client.get(url).query(&[("apiKey", final_api_key)]).send()?;
+    res.json::<LastBlock>()
 }
 
 pub fn get_token_new(api_key: &str) -> Result<Vec<TokenInfo>, Error> {
@@ -150,19 +106,8 @@ pub fn get_token_new(api_key: &str) -> Result<Vec<TokenInfo>, Error> {
         final_api_key = api_key;
     }
 
-    let query = client.get(url).query(&[("apiKey", final_api_key)]).send();
-
-    let res = match query {
-        Ok(res) => res,
-        Err(e) => return Err(e),
-    };
-
-    let block = match res.json::<Vec<TokenInfo>>() {
-        Ok(last_block) => last_block,
-        Err(e) => return Err(e),
-    };
-
-    Ok(block)
+    let res = client.get(url).query(&[("apiKey", final_api_key)]).send()?;
+    res.json::<Vec<TokenInfo>>()
 }
 
 pub fn get_token_daily_transaction_count(
@@ -191,19 +136,8 @@ pub fn get_token_daily_transaction_count(
         query_params[1] = ("period", period_string.as_str())
     }
 
-    let query = client.get(url).query(&query_params).send();
-
-    let res = match query {
-        Ok(res) => res,
-        Err(e) => return Err(e),
-    };
-
-    let counts = match res.json::<TokenDailyTransactionCounts>() {
-        Ok(txs_counts) => txs_counts,
-        Err(e) => return Err(e),
-    };
-
-    Ok(counts)
+    let res = client.get(url).query(&query_params).send()?;
+    res.json::<TokenDailyTransactionCounts>()
 }
 
 pub fn get_token_history(
@@ -244,19 +178,8 @@ pub fn get_token_history(
         query_params[3] = ("timestamp", timestamp_string.as_str());
     }
 
-    let query = client.get(url).query(&query_params).send();
-
-    let res = match query {
-        Ok(res) => res,
-        Err(e) => return Err(e),
-    };
-
-    let counts = match res.json::<TokenHistory>() {
-        Ok(txs_counts) => txs_counts,
-        Err(e) => return Err(e),
-    };
-
-    Ok(counts)
+    let res = client.get(url).query(&query_params).send()?;
+    res.json::<TokenHistory>()
 }
 
 pub fn get_address_history(
@@ -306,19 +229,9 @@ pub fn get_address_history(
         query_params[4] = ("token", params.token.as_str());
     }
 
-    let query = client.get(url).query(&query_params).send();
+    let res = client.get(url).query(&query_params).send()?;
 
-    let res = match query {
-        Ok(res) => res,
-        Err(e) => return Err(e),
-    };
-
-    let counts = match res.json::<TokenHistory>() {
-        Ok(txs_counts) => txs_counts,
-        Err(e) => return Err(e),
-    };
-
-    Ok(counts)
+    res.json::<TokenHistory>()
 }
 
 pub fn get_address_transactions(
@@ -358,19 +271,8 @@ pub fn get_address_transactions(
     let show_zero_values = params.show_zero_values.to_string();
     query_params[3] = ("showZeroValues", show_zero_values.as_str());
 
-    let query = client.get(url).query(&query_params).send();
-
-    let res = match query {
-        Ok(res) => res,
-        Err(e) => return Err(e),
-    };
-
-    let counts = match res.json::<Vec<AddressTransaction>>() {
-        Ok(txs_counts) => txs_counts,
-        Err(e) => return Err(e),
-    };
-
-    Ok(counts)
+    let res = client.get(url).query(&query_params).send()?;
+    res.json::<Vec<AddressTransaction>>()
 }
 
 pub fn get_top_tokens(api_key: &str) -> Result<TopTokens, Error> {
@@ -384,19 +286,9 @@ pub fn get_top_tokens(api_key: &str) -> Result<TopTokens, Error> {
         final_api_key = api_key;
     }
 
-    let query = client.get(url).query(&[("apiKey", final_api_key)]).send();
+    let res = client.get(url).query(&[("apiKey", final_api_key)]).send()?;
 
-    let res = match query {
-        Ok(res) => res,
-        Err(e) => return Err(e),
-    };
-
-    let block = match res.json::<TopTokens>() {
-        Ok(last_block) => last_block,
-        Err(e) => return Err(e),
-    };
-
-    Ok(block)
+    res.json::<TopTokens>()
 }
 
 pub fn get_top(params: &GetTopParams, api_key: &str) -> Result<TopTokens, Error> {
@@ -427,19 +319,8 @@ pub fn get_top(params: &GetTopParams, api_key: &str) -> Result<TopTokens, Error>
         query_params[2] = ("criteria", params.criteria.as_str());
     }
 
-    let query = client.get(url).query(&query_params).send();
-
-    let res = match query {
-        Ok(res) => res,
-        Err(e) => return Err(e),
-    };
-
-    let block = match res.json::<TopTokens>() {
-        Ok(last_block) => last_block,
-        Err(e) => return Err(e),
-    };
-
-    Ok(block)
+    let res = client.get(url).query(&query_params).send()?;
+    res.json::<TopTokens>()
 }
 
 pub fn get_token_daily_price_history(
@@ -468,17 +349,6 @@ pub fn get_token_daily_price_history(
         query_params[1] = ("period", period_string.as_str())
     }
 
-    let query = client.get(url).query(&query_params).send();
-
-    let res = match query {
-        Ok(res) => res,
-        Err(e) => return Err(e),
-    };
-
-    let counts = match res.json::<TokenDailyPriceHistory>() {
-        Ok(txs_counts) => txs_counts,
-        Err(e) => return Err(e),
-    };
-
-    Ok(counts)
+    let res = client.get(url).query(&query_params).send()?;
+    res.json::<TokenDailyPriceHistory>()
 }

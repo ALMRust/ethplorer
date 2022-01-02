@@ -1,3 +1,5 @@
+const FREE_KEY: &str = "freekey";
+
 const NETWORK: &str = "https://api.ethplorer.io";
 const GET_ADDRESS_INFO_ROUTE: &str = "getAddressInfo";
 const GET_TOKEN_INFO_ROUTE: &str = "getTokenInfo";

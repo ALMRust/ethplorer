@@ -1,6 +1,5 @@
 #![feature(in_band_lifetimes)]
 
-use num::clamp;
 pub use crate::types::*;
 use serde::de::DeserializeOwned;
 pub use crate::consts::*;
@@ -63,7 +62,7 @@ pub fn get_top_token_holders_config(api_key: &str, address: &str, mut limit: u64
     let mut params = vec![key];
 
     if limit != 0 {
-        limit = clamp(limit, 0, 1000);
+        limit = limit.clamp(0, 1000);
         params.push(("limit".to_string(), limit.to_string()))
     }
 
@@ -107,7 +106,7 @@ pub fn get_token_daily_transaction_count_config(api_key: &str, address: &str, mu
     let mut params = vec![key];
 
     if period != 0 {
-        period = clamp(period, 0, 90);
+        period = period.clamp( 0, 90);
         params.push(("period".to_string(), period.to_string()))
     }
 
@@ -126,7 +125,7 @@ pub fn get_token_history_config(api_key: &str, address: &str, in_params: &GetTok
 
     let mut limit = in_params.limit;
     if limit != 0 {
-        limit = clamp(limit, 0, 1000);
+        limit = limit.clamp(0, 1000);
         params.push(("limit".to_string(), limit.to_string()))
     }
 
@@ -154,7 +153,7 @@ pub fn get_address_history_config(api_key: &str, address: &str, in_params: &GetA
 
     let mut limit = in_params.limit;
     if limit != 0 {
-        limit = clamp(limit, 0, 1000);
+        limit = limit.clamp(0, 1000);
         params.push(("limit".to_string(), limit.to_string()))
     }
 
@@ -186,7 +185,7 @@ pub fn get_address_transactions_config(api_key: &str, address: &str, in_params: 
 
     let mut limit = in_params.limit;
     if limit != 0 {
-        limit = clamp(limit, 0, 1000);
+        limit = limit.clamp(0, 1000);
         params.push(("limit".to_string(), limit.to_string()))
     }
 
@@ -226,7 +225,7 @@ pub fn get_top_config(api_key: &str, in_params: &GetTopParams) -> RequestConfig 
 
     let mut limit = in_params.limit;
     if limit != 0 {
-        limit = clamp(limit, 0, 1000);
+        limit = limit.clamp(0, 1000);
         params.push(("limit".to_string(), limit.to_string()))
     }
 
@@ -252,7 +251,7 @@ pub fn get_token_daily_price_history_config(
     let mut params = vec![key];
 
     if period != 0 {
-        period = clamp(period, 0, 90);
+        period = period.clamp(0, 90);
         params.push(("period".to_string(), period.to_string()))
     }
 

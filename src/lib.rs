@@ -2,7 +2,6 @@
 
 use num::clamp;
 pub use crate::types::*;
-use reqwest::Error;
 use serde::de::DeserializeOwned;
 pub use crate::consts::*;
 

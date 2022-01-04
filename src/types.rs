@@ -316,7 +316,7 @@ fn date_or_timestamp<'de, D>(deserializer: D) -> Result<Timestamp, D::Error>
         type Value = Timestamp;
 
         fn expecting(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
-            fmtr.write_str("bool or map")
+            fmtr.write_str("i64, i32 or str")
         }
 
         fn visit_i64<E>(self, v: i64) -> Result<Timestamp, E>

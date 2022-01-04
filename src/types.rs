@@ -331,7 +331,8 @@ fn date_or_timestamp<'de, D>(deserializer: D) -> Result<Timestamp, D::Error>
             where
                 E: de::Error,
         {
-            Ok(Timestamp(DateTime::from_str(s)?))
+            let date = DateTime::<Utc>::from_str(s)?;
+            Ok(Timestamp(date))
         }
     }
     deserializer.deserialize_any(DateOrTimestamp(PhantomData))

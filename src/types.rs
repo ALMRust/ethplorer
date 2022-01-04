@@ -285,7 +285,7 @@ pub struct ETH {
 pub struct ContractInfo {
     pub creator_hash: String,
     pub transaction_hash: String,
-    #[serde(default)]
+    #[serde(deserialize_with = "date_or_timestamp", default)]
     pub timestamp: Timestamp,
 }
 #[derive(Deserialize, Debug)]
@@ -306,6 +306,40 @@ impl Default for Timestamp {
     }
 }
 
+fn date_or_timestamp<'de, T, D>(deserializer: D) -> Result<T, D::Error>
+    where
+        T: Deserialize<'de> + FromStr<Err = Void>,
+        D: Deserializer<'de>,
+{
+    struct DateOrTimestamp<T>(PhantomData<fn() -> T>);
+
+    impl<'de, T> Visitor<'de> for DateOrTimestamp<T>
+        where
+            T: Deserialize<'de> + FromStr<Err = Void>,
+    {
+        type Value = T;
+
+        fn expecting(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+            fmtr.write_str("bool or map")
+        }
+
+        fn visit_u64<E>(self, v: u64) -> Result<T, E>
+            where
+                E: de::Error,
+        {
+            Ok(Timestamp(DateTime::from_timestamp(v, 0)))
+        }
+
+        fn visit_str<E>(self, s: &str) -> Result<T, E>
+            where
+                E: de::Error,
+        {
+            Ok(Timestamp(DateTime::from_str(s)?))
+        }
+    }
+    deserializer.deserialize_any(DateOrTimestamp(PhantomData))
+}
+
 #[derive(Deserialize, Debug, Default)]
 pub struct AddressInfo {
     pub address: String,
@@ -320,6 +354,7 @@ pub struct AddressInfo {
 
 #[derive(Deserialize, Debug, Default)]
 pub struct Operations {
+    #[serde(deserialize_with = "date_or_timestamp")]
     pub timestamp: Timestamp,
     #[serde(rename(deserialize = "transaction_hash"), default)]
     pub transaction_hash: String,
@@ -342,7 +377,8 @@ pub struct TokenHistory {
 
 #[derive(Deserialize, Debug, Default)]
 pub struct AddressTransaction {
-    pub timestamp: String,
+    #[serde(deserialize_with = "date_or_timestamp")]
+    pub timestamp: Timestamp,
     pub from: String,
     pub to: String,
     pub hash: String,
@@ -361,6 +397,7 @@ pub struct TopTokens {
 #[derive(Deserialize, Debug, Default)]
 pub struct Price {
     pub ts: u64,
+    #[serde(deserialize_with = "date_or_timestamp")]
     pub date: Timestamp,
     pub open: f64,
     pub close: f64,

@@ -155,13 +155,13 @@ impl FromStr for Prices {
 #[derive(Deserialize, Debug, Default)]
 pub struct Prices(Vec<Price>);
 
-impl Deref for Prices {
-    type Target = Vec<Price>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
+// impl Deref for Prices {
+//     type Target = Vec<Price>;
+//
+//     fn deref(&self) -> &Self::Target {
+//         &self.0
+//     }
+// }
 
 fn string_or_vector<'de, T, D>(deserializer: D) -> Result<T, D::Error>
 where

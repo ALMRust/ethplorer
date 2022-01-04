@@ -356,7 +356,7 @@ pub struct Operations {
     pub address: String,
     pub from: String,
     pub to: String,
-    #[serde(deserialize_with = "num_from_str")]
+    #[serde(deserialize_with = "str_or_u64", default)]
     pub value: u64,
 }
 

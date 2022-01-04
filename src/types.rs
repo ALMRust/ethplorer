@@ -335,6 +335,22 @@ fn date_or_timestamp<'de, D>(deserializer: D) -> Result<Timestamp, D::Error>
             Ok(Timestamp(DateTime::from_utc(naive, Utc)))
         }
 
+        fn visit_i16<E>(self, v: i16) -> Result<Timestamp, E>
+            where
+                E: de::Error,
+        {
+            let naive = NaiveDateTime::from_timestamp(v as i64, 0);
+            Ok(Timestamp(DateTime::from_utc(naive, Utc)))
+        }
+
+        fn visit_i8<E>(self, v: i8) -> Result<Timestamp, E>
+            where
+                E: de::Error,
+        {
+            let naive = NaiveDateTime::from_timestamp(v as i64, 0);
+            Ok(Timestamp(DateTime::from_utc(naive, Utc)))
+        }
+
         fn visit_str<E>(self, s: &str) -> Result<Timestamp, E>
             where
                 E: de::Error,

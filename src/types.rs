@@ -153,7 +153,7 @@ impl FromStr for Prices {
 }
 
 #[derive(Deserialize, Debug, Default)]
-pub struct Prices(#[serde(deserialize_with = "string_or_vector")] Vec<Price>);
+pub struct Prices(Vec<Price>);
 
 impl Deref for Prices {
     type Target = Vec<Price>;
@@ -419,6 +419,7 @@ pub struct Price {
 pub struct History {
     #[serde(rename(deserialize = "countTxs"))]
     pub count_txs: Vec<CountTxs>,
+    #[serde(deserialize_with = "string_or_vector")]
     pub prices: Prices,
 }
 

@@ -323,7 +323,7 @@ fn date_or_timestamp<'de, D>(deserializer: D) -> Result<Timestamp, D::Error>
             where
                 E: de::Error,
         {
-            Ok(Timestamp(DateTime::from_timestamp(v, 0)))
+            Ok(Timestamp(NaiveDateTime::from_timestamp(v, 0)))
         }
 
         fn visit_str<E>(self, s: &str) -> Result<Timestamp, E>

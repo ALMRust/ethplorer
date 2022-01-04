@@ -1,11 +1,11 @@
 #![feature(in_band_lifetimes)]
 
+pub use crate::consts::*;
 pub use crate::types::*;
 use serde::de::DeserializeOwned;
-pub use crate::consts::*;
 
-pub mod types;
 pub mod consts;
+pub mod types;
 
 // TODO: Add status code error handling
 // TODO: use macro for repeat values
@@ -75,9 +75,7 @@ pub fn get_top_token_holders_config(api_key: &str, address: &str, mut limit: u64
 
 // Get Last Block
 
-pub fn get_last_block_config(
-    api_key: &str,
-) -> RequestConfig {
+pub fn get_last_block_config(api_key: &str) -> RequestConfig {
     let key = api_key_param(api_key);
     RequestConfig {
         network: NETWORK.to_string(),
@@ -88,9 +86,7 @@ pub fn get_last_block_config(
 
 // Get Token New
 
-pub fn get_tokens_new_config(
-    api_key: &str,
-) -> RequestConfig {
+pub fn get_tokens_new_config(api_key: &str) -> RequestConfig {
     let key = api_key_param(api_key);
     RequestConfig {
         network: NETWORK.to_string(),
@@ -101,25 +97,36 @@ pub fn get_tokens_new_config(
 
 // Get Token Daily Transaction Count
 
-pub fn get_token_daily_transaction_count_config(api_key: &str, address: &str, mut period: u64) -> RequestConfig {
+pub fn get_token_daily_transaction_count_config(
+    api_key: &str,
+    address: &str,
+    mut period: u64,
+) -> RequestConfig {
     let key = api_key_param(api_key);
     let mut params = vec![key];
 
     if period != 0 {
-        period = period.clamp( 0, 90);
+        period = period.clamp(0, 90);
         params.push(("period".to_string(), period.to_string()))
     }
 
     RequestConfig {
         network: NETWORK.to_string(),
-        routes: vec![GET_TOKEN_DAILY_TRANSACTION_COUNT_ROUTE.to_string(), address.to_string()],
+        routes: vec![
+            GET_TOKEN_DAILY_TRANSACTION_COUNT_ROUTE.to_string(),
+            address.to_string(),
+        ],
         params,
     }
 }
 
 // Get Token History
 
-pub fn get_token_history_config(api_key: &str, address: &str, in_params: &GetTokenHistoryParams) -> RequestConfig {
+pub fn get_token_history_config(
+    api_key: &str,
+    address: &str,
+    in_params: &GetTokenHistoryParams,
+) -> RequestConfig {
     let key = api_key_param(api_key);
     let mut params = vec![key];
 
@@ -147,7 +154,11 @@ pub fn get_token_history_config(api_key: &str, address: &str, in_params: &GetTok
 
 // Get Address History
 
-pub fn get_address_history_config(api_key: &str, address: &str, in_params: &GetAddressHistoryParams) -> RequestConfig {
+pub fn get_address_history_config(
+    api_key: &str,
+    address: &str,
+    in_params: &GetAddressHistoryParams,
+) -> RequestConfig {
     let key = api_key_param(api_key);
     let mut params = vec![key];
 
@@ -179,7 +190,11 @@ pub fn get_address_history_config(api_key: &str, address: &str, in_params: &GetA
 
 // Get Address Transactions
 
-pub fn get_address_transactions_config(api_key: &str, address: &str, in_params: &GetAddressTransactionsParams) -> RequestConfig {
+pub fn get_address_transactions_config(
+    api_key: &str,
+    address: &str,
+    in_params: &GetAddressTransactionsParams,
+) -> RequestConfig {
     let key = api_key_param(api_key);
     let mut params = vec![key];
 
@@ -199,16 +214,17 @@ pub fn get_address_transactions_config(api_key: &str, address: &str, in_params: 
 
     RequestConfig {
         network: NETWORK.to_string(),
-        routes: vec![GET_ADDRESS_TRANSACTIONS_ROUTE.to_string(), address.to_string()],
+        routes: vec![
+            GET_ADDRESS_TRANSACTIONS_ROUTE.to_string(),
+            address.to_string(),
+        ],
         params,
     }
 }
 
 // Get Top Tokens
 
-pub fn get_top_tokens_config(
-    api_key: &str,
-) -> RequestConfig {
+pub fn get_top_tokens_config(api_key: &str) -> RequestConfig {
     let key = api_key_param(api_key);
     RequestConfig {
         network: NETWORK.to_string(),
@@ -243,9 +259,9 @@ pub fn get_top_config(api_key: &str, in_params: &GetTopParams) -> RequestConfig 
 // Get Token Daily Price History
 
 pub fn get_token_daily_price_history_config(
-    api_key: & str,
+    api_key: &str,
     address: &str,
-    mut period: u64
+    mut period: u64,
 ) -> RequestConfig {
     let key = api_key_param(api_key);
     let mut params = vec![key];
@@ -257,7 +273,10 @@ pub fn get_token_daily_price_history_config(
 
     RequestConfig {
         network: NETWORK.to_string(),
-        routes: vec![GET_TOKEN_PRICE_HISTORY_GROUPED_ROUTE.to_string(), address.to_string()],
+        routes: vec![
+            GET_TOKEN_PRICE_HISTORY_GROUPED_ROUTE.to_string(),
+            address.to_string(),
+        ],
         params,
     }
 }

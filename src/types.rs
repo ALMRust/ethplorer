@@ -1,6 +1,6 @@
 use chrono::serde::ts_seconds;
 use chrono::{DateTime, NaiveDateTime, Utc};
-use serde::de::{MapAccess, Visitor, SeqAccess, value};
+use serde::de::{value, MapAccess, SeqAccess, Visitor};
 use serde::{de, Deserialize, Deserializer};
 use std::fmt;
 use std::fmt::{Display, Formatter};
@@ -153,7 +153,7 @@ impl FromStr for Prices {
 }
 
 #[derive(Deserialize, Debug, Default)]
-pub struct Prices(Vec<Price>);
+pub struct Prices(#[serde(deserialize_with = "string_or_vector")] Vec<Price>);
 
 impl Deref for Prices {
     type Target = Vec<Price>;
@@ -164,15 +164,15 @@ impl Deref for Prices {
 }
 
 fn string_or_vector<'de, T, D>(deserializer: D) -> Result<T, D::Error>
-    where
-        T: Deserialize<'de> + FromStr<Err = Void>,
-        D: Deserializer<'de>,
+where
+    T: Deserialize<'de> + FromStr<Err = Void>,
+    D: Deserializer<'de>,
 {
     struct StringOrVec<T>(PhantomData<fn() -> T>);
 
     impl<'de, T> Visitor<'de> for StringOrVec<T>
-        where
-            T: Deserialize<'de> + FromStr<Err = Void>,
+    where
+        T: Deserialize<'de> + FromStr<Err = Void>,
     {
         type Value = T;
 
@@ -181,14 +181,15 @@ fn string_or_vector<'de, T, D>(deserializer: D) -> Result<T, D::Error>
         }
 
         fn visit_bool<E>(self, _: bool) -> Result<T, E>
-            where
-                E: de::Error,
+        where
+            E: de::Error,
         {
             Ok(FromStr::from_str("").unwrap())
         }
 
         fn visit_seq<S>(self, seq: S) -> Result<Self::Value, S::Error>
-            where S: SeqAccess<'de>
+        where
+            S: SeqAccess<'de>,
         {
             Deserialize::deserialize(value::SeqAccessDeserializer::new(seq))
         }
@@ -207,8 +208,8 @@ where
 }
 
 fn str_or_u64<'de, D>(deserializer: D) -> Result<u64, D::Error>
-    where
-        D: Deserializer<'de>,
+where
+    D: Deserializer<'de>,
 {
     #[derive(Deserialize)]
     #[serde(untagged)]
@@ -224,8 +225,8 @@ fn str_or_u64<'de, D>(deserializer: D) -> Result<u64, D::Error>
 }
 
 fn str_or_u128<'de, D>(deserializer: D) -> Result<u128, D::Error>
-    where
-        D: Deserializer<'de>,
+where
+    D: Deserializer<'de>,
 {
     #[derive(Deserialize)]
     #[serde(untagged)]
@@ -418,7 +419,6 @@ pub struct Price {
 pub struct History {
     #[serde(rename(deserialize = "countTxs"))]
     pub count_txs: Vec<CountTxs>,
-    #[serde(deserialize_with = "string_or_vector")]
     pub prices: Prices,
 }
 

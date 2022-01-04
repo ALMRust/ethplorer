@@ -153,7 +153,8 @@ impl FromStr for Prices {
 }
 
 #[derive(Deserialize, Debug, Default)]
-pub struct Prices(#[serde(transparent)] Vec<Price>);
+#[serde(transparent)]
+pub struct Prices(Vec<Price>);
 
 impl Deref for Prices {
     type Target = Vec<Price>;

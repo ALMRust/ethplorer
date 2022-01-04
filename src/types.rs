@@ -142,16 +142,6 @@ where
     deserializer.deserialize_any(StringOrStruct(PhantomData))
 }
 
-impl FromStr for Prices {
-    // This implementation of `from_str` can never fail, so use the impossible
-    // `Void` type as the error type.
-    type Err = Void;
-
-    fn from_str(_: &str) -> Result<Self, Self::Err> {
-        Ok(Prices(Vec::new()))
-    }
-}
-
 #[derive(Deserialize, Debug, Default)]
 #[serde(transparent)]
 pub struct Prices(Vec<Price>);
@@ -162,47 +152,6 @@ impl Deref for Prices {
     fn deref(&self) -> &Self::Target {
         &self.0
     }
-}
-
-fn string_or_vector<'de, T, D>(deserializer: D) -> Result<T, D::Error>
-where
-    T: Deserialize<'de> + FromStr<Err = Void>,
-    D: Deserializer<'de>,
-{
-    struct StringOrVec<T>(PhantomData<fn() -> T>);
-
-    impl<'de, T> Visitor<'de> for StringOrVec<T>
-    where
-        T: Deserialize<'de> + FromStr<Err = Void>,
-    {
-        type Value = T;
-
-        fn expecting(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
-            fmtr.write_str("bool or map")
-        }
-
-        fn visit_bool<E>(self, _: bool) -> Result<T, E>
-        where
-            E: de::Error,
-        {
-            Ok(FromStr::from_str("").unwrap())
-        }
-
-        fn visit_seq<S>(self, seq: S) -> Result<Self::Value, S::Error>
-        where
-            S: SeqAccess<'de>,
-        {
-            Deserialize::deserialize(value::SeqAccessDeserializer::new(seq))
-        }
-
-        fn visit_map<M>(self, map: M) -> Result<T, M::Error>
-            where
-                M: MapAccess<'de>,
-        {
-            Deserialize::deserialize(de::value::MapAccessDeserializer::new(map))
-        }
-    }
-    deserializer.deserialize_any(StringOrVec(PhantomData))
 }
 
 fn num_from_str<'de, T, D>(deserializer: D) -> Result<T, D::Error>
@@ -393,7 +342,7 @@ pub struct TokenHistory {
 
 #[derive(Deserialize, Debug, Default)]
 pub struct AddressTransaction {
-    pub timestamp: Timestamp,
+    pub timestamp: String,
     pub from: String,
     pub to: String,
     pub hash: String,

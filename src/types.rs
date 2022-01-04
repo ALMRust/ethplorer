@@ -193,6 +193,13 @@ where
         {
             Deserialize::deserialize(value::SeqAccessDeserializer::new(seq))
         }
+
+        fn visit_map<M>(self, map: M) -> Result<T, M::Error>
+            where
+                M: MapAccess<'de>,
+        {
+            Deserialize::deserialize(de::value::MapAccessDeserializer::new(map))
+        }
     }
     deserializer.deserialize_any(StringOrVec(PhantomData))
 }

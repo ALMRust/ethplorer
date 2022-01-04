@@ -310,14 +310,12 @@ fn date_or_timestamp<'de, D>(deserializer: D) -> Result<Timestamp, D::Error>
     where
         D: Deserializer<'de>,
 {
-    #[derive(Debug)]
     struct DateOrTimestamp(PhantomData<fn() -> Timestamp>);
 
     impl<'de> Visitor<'de> for DateOrTimestamp {
         type Value = Timestamp;
 
         fn expecting(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
-           println!("{:?}", self);
             fmtr.write_str("i64, i32 or str")
         }
 
@@ -346,6 +344,38 @@ fn date_or_timestamp<'de, D>(deserializer: D) -> Result<Timestamp, D::Error>
         }
 
         fn visit_i8<E>(self, v: i8) -> Result<Timestamp, E>
+            where
+                E: de::Error,
+        {
+            let naive = NaiveDateTime::from_timestamp(v as i64, 0);
+            Ok(Timestamp(DateTime::from_utc(naive, Utc)))
+        }
+
+        fn visit_u64<E>(self, v: u64) -> Result<Timestamp, E>
+            where
+                E: de::Error,
+        {
+            let naive = NaiveDateTime::from_timestamp(v as i64, 0);
+            Ok(Timestamp(DateTime::from_utc(naive, Utc)))
+        }
+
+        fn visit_u32<E>(self, v: u32) -> Result<Timestamp, E>
+            where
+                E: de::Error,
+        {
+            let naive = NaiveDateTime::from_timestamp(v as i64, 0);
+            Ok(Timestamp(DateTime::from_utc(naive, Utc)))
+        }
+
+        fn visit_u16<E>(self, v: u16) -> Result<Timestamp, E>
+            where
+                E: de::Error,
+        {
+            let naive = NaiveDateTime::from_timestamp(v as i64, 0);
+            Ok(Timestamp(DateTime::from_utc(naive, Utc)))
+        }
+
+        fn visit_u8<E>(self, v: u8) -> Result<Timestamp, E>
             where
                 E: de::Error,
         {

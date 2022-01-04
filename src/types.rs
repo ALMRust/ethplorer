@@ -327,7 +327,7 @@ fn date_or_timestamp<'de, D>(deserializer: D) -> Result<Timestamp, D::Error>
             Ok(Timestamp(DateTime::from_utc(naive, Utc)))
         }
 
-        fn visit_str<E: de::Error + std::convert::From<chrono::ParseError>>(self, s: &str) -> Result<Timestamp, E>
+        fn visit_str<E: de::Error + std::convert::From<chrono::ParseError> + From<chrono::ParseError>>(self, s: &str) -> Result<Timestamp, E>
             where
                 E: de::Error,
         {

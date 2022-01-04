@@ -334,7 +334,7 @@ fn date_or_timestamp<'de, D>(deserializer: D) -> Result<Timestamp, D::Error>
             let date = DateTime::<Utc>::from_str(s);
             match date {
                 Ok(v) => Ok(Timestamp(v)),
-                Err(e) => serde::de::Error::custom(e),
+                Err(_) => Ok(Timestamp::default()),
             }
         }
     }

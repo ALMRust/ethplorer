@@ -223,6 +223,23 @@ fn str_or_u64<'de, D>(deserializer: D) -> Result<u64, D::Error>
     })
 }
 
+fn str_or_u128<'de, D>(deserializer: D) -> Result<u128, D::Error>
+    where
+        D: Deserializer<'de>,
+{
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum StrOrU128<'a> {
+        Str(&'a str),
+        U128(u128),
+    }
+
+    Ok(match StrOrU128::deserialize(deserializer)? {
+        StrOrU128::Str(v) => v.parse().unwrap_or(0), // Ignoring parsing errors
+        StrOrU128::U128(v) => v,
+    })
+}
+
 #[derive(Deserialize, Debug, Default)]
 pub struct TokenInfo {
     pub address: String,
@@ -356,8 +373,8 @@ pub struct Operations {
     pub address: String,
     pub from: String,
     pub to: String,
-    #[serde(deserialize_with = "str_or_u64", default)]
-    pub value: u64,
+    #[serde(deserialize_with = "str_or_u128", default)]
+    pub value: u128,
 }
 
 #[derive(Deserialize, Debug, Default)]

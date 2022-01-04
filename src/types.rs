@@ -319,11 +319,12 @@ fn date_or_timestamp<'de, D>(deserializer: D) -> Result<Timestamp, D::Error>
             fmtr.write_str("bool or map")
         }
 
-        fn visit_u64<E>(self, v: u64) -> Result<Timestamp, E>
+        fn visit_i64<E>(self, v: i64) -> Result<Timestamp, E>
             where
                 E: de::Error,
         {
-            Ok(Timestamp(NaiveDateTime::from_timestamp(v, 0)))
+            let naive = NaiveDateTime::from_timestamp(v, 0);
+            Ok(Timestamp(DateTime::from_utc(naive, Utc)))
         }
 
         fn visit_str<E>(self, s: &str) -> Result<Timestamp, E>

@@ -306,31 +306,27 @@ impl Default for Timestamp {
     }
 }
 
-fn date_or_timestamp<'de, T, D>(deserializer: D) -> Result<T, D::Error>
+fn date_or_timestamp<'de, D>(deserializer: D) -> Result<Timestamp, D::Error>
     where
-        T: Deserialize<'de> + FromStr<Err = Void>,
         D: Deserializer<'de>,
 {
-    struct DateOrTimestamp<T>(PhantomData<fn() -> T>);
+    struct DateOrTimestamp(PhantomData<fn() -> Timestamp>);
 
-    impl<'de, T> Visitor<'de> for DateOrTimestamp<T>
-        where
-            T: Deserialize<'de> + FromStr<Err = Void>,
-    {
-        type Value = T;
+    impl<'de> Visitor<'de> for DateOrTimestamp {
+        type Value = Timestamp;
 
         fn expecting(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
             fmtr.write_str("bool or map")
         }
 
-        fn visit_u64<E>(self, v: u64) -> Result<T, E>
+        fn visit_u64<E>(self, v: u64) -> Result<Timestamp, E>
             where
                 E: de::Error,
         {
             Ok(Timestamp(DateTime::from_timestamp(v, 0)))
         }
 
-        fn visit_str<E>(self, s: &str) -> Result<T, E>
+        fn visit_str<E>(self, s: &str) -> Result<Timestamp, E>
             where
                 E: de::Error,
         {

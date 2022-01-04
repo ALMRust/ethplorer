@@ -3,7 +3,7 @@ use chrono::{DateTime, NaiveDateTime, Utc};
 use serde::de::{value, MapAccess, SeqAccess, Visitor};
 use serde::{de, Deserialize, Deserializer};
 use std::fmt;
-use std::fmt::{Display, Formatter};
+use std::fmt::{Display, Formatter, Write};
 use std::marker::PhantomData;
 use std::ops::Deref;
 use std::str::FromStr;
@@ -310,12 +310,14 @@ fn date_or_timestamp<'de, D>(deserializer: D) -> Result<Timestamp, D::Error>
     where
         D: Deserializer<'de>,
 {
+    #[derive(Debug)]
     struct DateOrTimestamp(PhantomData<fn() -> Timestamp>);
 
     impl<'de> Visitor<'de> for DateOrTimestamp {
         type Value = Timestamp;
 
         fn expecting(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+           println!("{:?}", self);
             fmtr.write_str("i64, i32 or str")
         }
 

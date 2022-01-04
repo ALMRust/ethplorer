@@ -327,12 +327,15 @@ fn date_or_timestamp<'de, D>(deserializer: D) -> Result<Timestamp, D::Error>
             Ok(Timestamp(DateTime::from_utc(naive, Utc)))
         }
 
-        fn visit_str<E: de::Error + std::convert::From<chrono::ParseError> + From<chrono::ParseError>>(self, s: &str) -> Result<Timestamp, E>
+        fn visit_str<E>(self, s: &str) -> Result<Timestamp, E>
             where
                 E: de::Error,
         {
-            let date = DateTime::<Utc>::from_str(s)?;
-            Ok(Timestamp(date))
+            let date = DateTime::<Utc>::from_str(s);
+            match date {
+                Ok(v) => Ok(Timestamp(v)),
+                Err(e) => serde::de::Error::custom(e),
+            }
         }
     }
     deserializer.deserialize_any(DateOrTimestamp(PhantomData))

@@ -426,7 +426,6 @@ pub struct Price {
 pub struct History {
     #[serde(rename(deserialize = "countTxs"))]
     pub count_txs: Vec<CountTxs>,
-    #[serde(deserialize_with = "string_or_vector")]
     pub prices: Prices,
 }
 

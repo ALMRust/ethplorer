@@ -164,40 +164,6 @@ where
     T::from_str(&s).map_err(de::Error::custom)
 }
 
-// fn str_or_u64<'de, D>(deserializer: D) -> Result<u64, D::Error>
-// where
-//     D: Deserializer<'de>,
-// {
-//     #[derive(Deserialize)]
-//     #[serde(untagged)]
-//     enum StrOrU64<'a> {
-//         Str(&'a str),
-//         U64(u64),
-//     }
-//
-//     Ok(match StrOrU64::deserialize(deserializer)? {
-//         StrOrU64::Str(v) => v.parse().unwrap_or(0), // Ignoring parsing errors
-//         StrOrU64::U64(v) => v,
-//     })
-// }
-//
-// fn str_or_u128<'de, D>(deserializer: D) -> Result<u128, D::Error>
-// where
-//     D: Deserializer<'de>,
-// {
-//     #[derive(Deserialize)]
-//     #[serde(untagged)]
-//     enum StrOrU128<'a> {
-//         Str(&'a str),
-//         U128(u128),
-//     }
-//
-//     Ok(match StrOrU128::deserialize(deserializer)? {
-//         StrOrU128::Str(v) => v.parse().unwrap_or(0), // Ignoring parsing errors
-//         StrOrU128::U128(v) => v,
-//     })
-// }
-
 #[derive(Deserialize, Debug, Default)]
 pub struct TokenInfo {
     pub address: String,

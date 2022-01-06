@@ -10,12 +10,11 @@ pub mod types;
 // TODO: use macro for repeat values
 
 pub fn api_key_param(api_key: &str) -> (String, String) {
-    let out;
-    if api_key == "" {
-        out = String::from("freekey");
+    let out = if api_key.is_empty() {
+        String::from("freekey")
     } else {
-        out = api_key.to_string();
-    }
+        api_key.to_string()
+    };
     (String::from("apiKey"), out)
 }
 
@@ -29,7 +28,7 @@ pub fn get_address_info_config(
     let key = api_key_param(api_key);
     let mut params = vec![key];
 
-    if in_params.token != "" {
+    if !in_params.token.is_empty() {
         params.push(("token".to_string(), in_params.token.clone()));
     }
 
@@ -135,7 +134,7 @@ pub fn get_token_history_config(
         params.push(("limit".to_string(), limit.to_string()))
     }
 
-    if in_params.history_type != "" {
+    if !in_params.history_type.is_empty() {
         params.push(("type".to_string(), in_params.history_type.clone()));
     }
 
@@ -167,7 +166,7 @@ pub fn get_address_history_config(
         params.push(("limit".to_string(), limit.to_string()))
     }
 
-    if in_params.history_type != "" {
+    if !in_params.history_type.is_empty() {
         params.push(("type".to_string(), in_params.history_type.clone()));
     }
 
@@ -176,7 +175,7 @@ pub fn get_address_history_config(
         params.push(("timestamp".to_string(), timestamp.to_string()));
     }
 
-    if in_params.token != "" {
+    if !in_params.token.is_empty() {
         params.push(("token".to_string(), in_params.token.clone()));
     }
 
@@ -244,7 +243,7 @@ pub fn get_top_config(api_key: &str, in_params: &GetTopParams) -> RequestConfig 
         params.push(("limit".to_string(), limit.to_string()))
     }
 
-    if in_params.criteria != "" {
+    if !in_params.criteria.is_empty() {
         params.push(("criteria".to_string(), in_params.criteria.clone()));
     }
 

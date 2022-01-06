@@ -1,3 +1,4 @@
+#![warn(clippy::all, clippy::pedantic)]
 #![feature(in_band_lifetimes)]
 
 pub use crate::consts::*;
@@ -9,6 +10,7 @@ pub mod types;
 // TODO: Add status code error handling
 // TODO: use macro for repeat values
 
+#[must_use]
 pub fn api_key_param(api_key: &str) -> (String, String) {
     let out = if api_key.is_empty() {
         String::from("freekey")
@@ -19,7 +21,7 @@ pub fn api_key_param(api_key: &str) -> (String, String) {
 }
 
 // Get Address Info
-
+#[must_use]
 pub fn get_address_info_config(
     api_key: &str,
     address: &str,
@@ -43,7 +45,7 @@ pub fn get_address_info_config(
 }
 
 // Get Token Info
-
+#[must_use]
 pub fn get_token_info_config(api_key: &str, address: &str) -> RequestConfig {
     let key = api_key_param(api_key);
     RequestConfig {
@@ -54,14 +56,14 @@ pub fn get_token_info_config(api_key: &str, address: &str) -> RequestConfig {
 }
 
 // Get Top Token Holders
-
+#[must_use]
 pub fn get_top_token_holders_config(api_key: &str, address: &str, mut limit: u64) -> RequestConfig {
     let key = api_key_param(api_key);
     let mut params = vec![key];
 
     if limit != 0 {
         limit = limit.clamp(0, 1000);
-        params.push(("limit".to_string(), limit.to_string()))
+        params.push(("limit".to_string(), limit.to_string()));
     }
 
     RequestConfig {
@@ -72,7 +74,7 @@ pub fn get_top_token_holders_config(api_key: &str, address: &str, mut limit: u64
 }
 
 // Get Last Block
-
+#[must_use]
 pub fn get_last_block_config(api_key: &str) -> RequestConfig {
     let key = api_key_param(api_key);
     RequestConfig {
@@ -83,7 +85,7 @@ pub fn get_last_block_config(api_key: &str) -> RequestConfig {
 }
 
 // Get Token New
-
+#[must_use]
 pub fn get_tokens_new_config(api_key: &str) -> RequestConfig {
     let key = api_key_param(api_key);
     RequestConfig {
@@ -94,7 +96,7 @@ pub fn get_tokens_new_config(api_key: &str) -> RequestConfig {
 }
 
 // Get Token Daily Transaction Count
-
+#[must_use]
 pub fn get_token_daily_transaction_count_config(
     api_key: &str,
     address: &str,
@@ -105,7 +107,7 @@ pub fn get_token_daily_transaction_count_config(
 
     if period != 0 {
         period = period.clamp(0, 90);
-        params.push(("period".to_string(), period.to_string()))
+        params.push(("period".to_string(), period.to_string()));
     }
 
     RequestConfig {
@@ -119,7 +121,7 @@ pub fn get_token_daily_transaction_count_config(
 }
 
 // Get Token History
-
+#[must_use]
 pub fn get_token_history_config(
     api_key: &str,
     address: &str,
@@ -131,7 +133,7 @@ pub fn get_token_history_config(
     let mut limit = in_params.limit;
     if limit != 0 {
         limit = limit.clamp(0, 1000);
-        params.push(("limit".to_string(), limit.to_string()))
+        params.push(("limit".to_string(), limit.to_string()));
     }
 
     if !in_params.history_type.is_empty() {
@@ -151,7 +153,7 @@ pub fn get_token_history_config(
 }
 
 // Get Address History
-
+#[must_use]
 pub fn get_address_history_config(
     api_key: &str,
     address: &str,
@@ -163,7 +165,7 @@ pub fn get_address_history_config(
     let mut limit = in_params.limit;
     if limit != 0 {
         limit = limit.clamp(0, 1000);
-        params.push(("limit".to_string(), limit.to_string()))
+        params.push(("limit".to_string(), limit.to_string()));
     }
 
     if !in_params.history_type.is_empty() {
@@ -187,7 +189,7 @@ pub fn get_address_history_config(
 }
 
 // Get Address Transactions
-
+#[must_use]
 pub fn get_address_transactions_config(
     api_key: &str,
     address: &str,
@@ -199,7 +201,7 @@ pub fn get_address_transactions_config(
     let mut limit = in_params.limit;
     if limit != 0 {
         limit = limit.clamp(0, 1000);
-        params.push(("limit".to_string(), limit.to_string()))
+        params.push(("limit".to_string(), limit.to_string()));
     }
 
     let timestamp = in_params.timestamp.timestamp();
@@ -221,7 +223,7 @@ pub fn get_address_transactions_config(
 }
 
 // Get Top Tokens
-
+#[must_use]
 pub fn get_top_tokens_config(api_key: &str) -> RequestConfig {
     let key = api_key_param(api_key);
     RequestConfig {
@@ -232,7 +234,7 @@ pub fn get_top_tokens_config(api_key: &str) -> RequestConfig {
 }
 
 // Get Top
-
+#[must_use]
 pub fn get_top_config(api_key: &str, in_params: &GetTopParams) -> RequestConfig {
     let key = api_key_param(api_key);
     let mut params = vec![key];
@@ -240,7 +242,7 @@ pub fn get_top_config(api_key: &str, in_params: &GetTopParams) -> RequestConfig 
     let mut limit = in_params.limit;
     if limit != 0 {
         limit = limit.clamp(0, 1000);
-        params.push(("limit".to_string(), limit.to_string()))
+        params.push(("limit".to_string(), limit.to_string()));
     }
 
     if !in_params.criteria.is_empty() {
@@ -255,7 +257,7 @@ pub fn get_top_config(api_key: &str, in_params: &GetTopParams) -> RequestConfig 
 }
 
 // Get Token Daily Price History
-
+#[must_use]
 pub fn get_token_daily_price_history_config(
     api_key: &str,
     address: &str,
@@ -266,7 +268,7 @@ pub fn get_token_daily_price_history_config(
 
     if period != 0 {
         period = period.clamp(0, 90);
-        params.push(("period".to_string(), period.to_string()))
+        params.push(("period".to_string(), period.to_string()));
     }
 
     RequestConfig {

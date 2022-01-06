@@ -1,3 +1,4 @@
+use std::convert::TryFrom;
 use chrono::serde::ts_seconds;
 use chrono::{DateTime, NaiveDateTime, Utc};
 use serde::de::{MapAccess, Visitor};
@@ -99,7 +100,7 @@ impl FromStr for TokenPrice {
 
     fn from_str(_: &str) -> Result<Self, Self::Err> {
         Ok(TokenPrice {
-            ..Default::default()
+            ..TokenPrice::default()
         })
     }
 }
@@ -297,7 +298,7 @@ fn date_or_timestamp<'de, D>(deserializer: D) -> Result<Timestamp, D::Error>
             where
                 E: de::Error,
         {
-            let naive = NaiveDateTime::from_timestamp(v as i64, 0);
+            let naive = NaiveDateTime::from_timestamp(i64::from(v), 0);
             Ok(Timestamp(DateTime::from_utc(naive, Utc)))
         }
 
@@ -305,7 +306,7 @@ fn date_or_timestamp<'de, D>(deserializer: D) -> Result<Timestamp, D::Error>
             where
                 E: de::Error,
         {
-            let naive = NaiveDateTime::from_timestamp(v as i64, 0);
+            let naive = NaiveDateTime::from_timestamp(i64::from(v), 0);
             Ok(Timestamp(DateTime::from_utc(naive, Utc)))
         }
 
@@ -313,7 +314,7 @@ fn date_or_timestamp<'de, D>(deserializer: D) -> Result<Timestamp, D::Error>
             where
                 E: de::Error,
         {
-            let naive = NaiveDateTime::from_timestamp(v as i64, 0);
+            let naive = NaiveDateTime::from_timestamp(i64::from(v), 0);
             Ok(Timestamp(DateTime::from_utc(naive, Utc)))
         }
 
@@ -321,7 +322,13 @@ fn date_or_timestamp<'de, D>(deserializer: D) -> Result<Timestamp, D::Error>
             where
                 E: de::Error,
         {
-            let naive = NaiveDateTime::from_timestamp(v as i64, 0);
+            let from = i64::try_from(v);
+            let out = if let Ok(val) = from {
+                val
+            } else {
+                i64::MAX
+            };
+            let naive = NaiveDateTime::from_timestamp(out, 0);
             Ok(Timestamp(DateTime::from_utc(naive, Utc)))
         }
 
@@ -329,7 +336,7 @@ fn date_or_timestamp<'de, D>(deserializer: D) -> Result<Timestamp, D::Error>
             where
                 E: de::Error,
         {
-            let naive = NaiveDateTime::from_timestamp(v as i64, 0);
+            let naive = NaiveDateTime::from_timestamp(i64::from(v), 0);
             Ok(Timestamp(DateTime::from_utc(naive, Utc)))
         }
 
@@ -337,7 +344,7 @@ fn date_or_timestamp<'de, D>(deserializer: D) -> Result<Timestamp, D::Error>
             where
                 E: de::Error,
         {
-            let naive = NaiveDateTime::from_timestamp(v as i64, 0);
+            let naive = NaiveDateTime::from_timestamp(i64::from(v), 0);
             Ok(Timestamp(DateTime::from_utc(naive, Utc)))
         }
 
@@ -345,7 +352,7 @@ fn date_or_timestamp<'de, D>(deserializer: D) -> Result<Timestamp, D::Error>
             where
                 E: de::Error,
         {
-            let naive = NaiveDateTime::from_timestamp(v as i64, 0);
+            let naive = NaiveDateTime::from_timestamp(i64::from(v), 0);
             Ok(Timestamp(DateTime::from_utc(naive, Utc)))
         }
 
